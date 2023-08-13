@@ -2,3 +2,7 @@
 	path = imgui
 	url = https://github.com/ocornut/imgui
 	branch = docking
+[submodule "libcplot"]
+	path = libcplot
+	url = https://github.com/davidl09/Complex-plot
+	branch = lib
