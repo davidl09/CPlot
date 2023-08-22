@@ -14,7 +14,7 @@ add_executable(test
     "libcplot/src/toojpeg.cpp"
 )
 
-include_directories(test imgui imgui/backends libcplot/include libcplot/include/expr_parsing_cpp)
+include_directories(test imgui imgui/backends libcplot/include libcplot/include/expr_parsing_cpp/src)
 
 add_compile_options(-Og -I/usr/include/SDL2 -D_REENTRANT)
 target_link_libraries(test SDL2 GL dl)
