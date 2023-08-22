@@ -4,7 +4,6 @@
 
 #include "libcplot.hpp"
 
-#include <stdio.h>
 #include <SDL2/SDL.h>
 
 #if !SDL_VERSION_ATLEAST(2,0,17)
@@ -41,7 +40,7 @@ int main(int, char**)
     
     int width = mode.w;
     int height = mode.h;
-    BitMap image(width, height);
+    BitMap image(width, height); //resolution set to max width
     image.plot_complex_func("z^2", 10, false, 16);
     SDL_Texture* imageTexture = nullptr;
     
@@ -86,12 +85,32 @@ int main(int, char**)
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != nullptr);
 */
+    
+
     bool done = false;
-    bool changed = false;
+    bool flip_due = true;
+    bool render_due = true;
+    auto ticks_at_last_render = SDL_GetTicks64();
+    float maxval = 10.0;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    //rendering and image flip callbacks
+    auto render = [&]()
+    {
+        image.plot_complex_func(std::string(text_input), static_cast<double>(maxval), false, 16); 
+        ticks_at_last_render = SDL_GetTicks64();
+        render_due = false; 
+    };
+
+    auto flip = [&]()
+    {
+        SDL_UpdateTexture(imageTexture, nullptr, image.get_data(), image.get_width() * 3);  
+        flip_due = false;
+    };
+
+    bool show_save_popup = false;
     while(!done) //main loop
     {
-
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -106,14 +125,14 @@ int main(int, char**)
         ImGui::NewFrame();       
         
         // Main menu bar
-
+        
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open")) {
                     // Handle open action
                 }
-                if (ImGui::MenuItem("Save")) {
-                    // Handle save action
+                if (ImGui::MenuItem("Save As")) {
+                    show_save_popup = true;
                 }
                 ImGui::EndMenu();
             }
@@ -121,23 +140,73 @@ int main(int, char**)
             ImGui::EndMainMenuBar();
         }
 
+        if(show_save_popup)
+        {
+            ImGui::BeginPopup("Save as");
+            /*
+            char filename[80] = {0};
+            ImGui::OpenPopup("Save current view", ImGuiPopupFlags_AnyPopup);
+
+            if (ImGui::BeginPopupModal("Save As Popup", &show_save_popup, ImGuiWindowFlags_AlwaysAutoResize)) {
+                ImGui::Text("Filename to save current view");
+                ImGui::InputText("Save", filename, IM_ARRAYSIZE(filename), ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_AlwaysOverwrite);
+
+                if (ImGui::Button("Ok")) {
+                    // Handle save logic here using 'filename'
+                    // For example: image.save_jpeg(filename);
+                    show_save_popup = false; // Close the popup
+                    ImGui::CloseCurrentPopup(); // Close the modal after saving
+                }
+
+                ImGui::SameLine();
+
+                if (ImGui::Button("Cancel")) {
+                    show_save_popup = false; // Close the popup
+                    ImGui::CloseCurrentPopup();
+                }
+                show_save_popup = false;
+                ImGui::EndPopup();
+            }
+            */
+        }
+
         float menuBarHeight = ImGui::GetFrameHeightWithSpacing(); // Height of the menu bar
         ImGui::SetNextWindowPos(ImVec2(0, menuBarHeight));
-        ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y - menuBarHeight * 3)); // Exclude menu bar and text input heights
+        auto img_size = ImVec2(io.DisplaySize.x, io.DisplaySize.y - menuBarHeight * 4);
+        ImGui::SetNextWindowSize(img_size); // Exclude menu bar and text input heights
+        //image.resize(img_size.x, img_size.y);
         ImGui::Begin("Image Display", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
-        ImGui::Image((void*)(intptr_t)imageTexture, ImVec2(io.DisplaySize.x, io.DisplaySize.y - menuBarHeight * 3));
+        ImGui::Image((void*)(intptr_t)imageTexture, img_size);
         ImGui::End();
         //ImGui::ShowMetricsWindow(); //debugging
-        ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - menuBarHeight * 2)); // Docked at the bottom
-        ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, menuBarHeight * 2));
+        //ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - menuBarHeight * 3)); // Docked at the bottom
+        //ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, menuBarHeight));
+
+        ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - menuBarHeight * 3));
+        ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, menuBarHeight * 3));
         ImGui::Begin("Text Input", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
-        
+
+        if(ImGui::SliderFloat("Image plot range", &maxval, 0.5, 100))
+        {
+            render_due = true;
+        }
+
         if(ImGui::InputText("f(z)", static_cast<char *>(&text_input[0]), 100))
         {
-            image.plot_complex_func(std::string(text_input), 10, false, 16);            
+            render_due = true;
         }
-        SDL_UpdateTexture(imageTexture, nullptr, image.get_data(), image.get_width() * 3);
+
+        if(!(SDL_GetTicks64() % (1000 / 144))) //1000 ms per second divided by framerate is the time between refreshing ticks
+        {
+            flip_due = true;
+        }
         ImGui::End();
+
+        if(flip_due)
+            flip();
+        //std::cout << ticks_at_last_render << "\n";
+        if(render_due && (SDL_GetTicks64() - ticks_at_last_render) > 1000)
+            render();
 
         // Rendering
         ImGui::Render();
