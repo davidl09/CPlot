@@ -6,6 +6,9 @@
 
 #include <SDL2/SDL.h>
 
+#include <string>
+#include <cstring>
+
 #if !SDL_VERSION_ATLEAST(2,0,17)
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
 #endif
@@ -27,7 +30,7 @@ int main(int, char**)
 
     // Create window with SDL_Renderer graphics context
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    SDL_Window* window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+    SDL_Window* window = SDL_CreateWindow("CPlot", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     if (renderer == nullptr)
     {
@@ -41,7 +44,7 @@ int main(int, char**)
     int width = mode.w;
     int height = mode.h;
     BitMap image(width, height); //resolution set to max width
-    image.plot_complex_func("z^2", 10, false, 16);
+    image.plot_complex_func("z", 10, false, 16);
     SDL_Texture* imageTexture = nullptr;
     
     unsigned char* imageData = image.get_data(); // Initialize with initial data
@@ -92,24 +95,33 @@ int main(int, char**)
     bool render_due = true;
     auto ticks_at_last_render = SDL_GetTicks64();
     float maxval = 10.0;
+    char error_text[100] = {0};
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     //rendering and image flip callbacks
     auto render = [&]()
     {
-        image.plot_complex_func(std::string(text_input), static_cast<double>(maxval), false, 16); 
+        try{
+            image.plot_complex_func(std::string(text_input), static_cast<double>(maxval), false, std::thread::hardware_concurrency()); 
+        }
+        catch(std::invalid_argument& e)
+        {
+            std::strcpy(error_text, e.what());
+            return;
+        }
+
+        error_text[0] = 0;
         ticks_at_last_render = SDL_GetTicks64();
         render_due = false; 
     };
 
-    auto flip = [&]()
-    {
+    auto flip = [&]() {
         SDL_UpdateTexture(imageTexture, nullptr, image.get_data(), image.get_width() * 3);  
         flip_due = false;
     };
 
     bool show_save_popup = false;
-    while(!done) //main loop
+    while (!done) //main loop
     {
         SDL_Event event;
         while (SDL_PollEvent(&event))
@@ -117,6 +129,7 @@ int main(int, char**)
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
                 done = true;
+
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
                 done = true;
         }
@@ -136,13 +149,18 @@ int main(int, char**)
                 }
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Examples")) {
+                if (ImGui::MenuItem("Spiral")) {
+                    text_input = 
+                }
+            }
             // Add more menus as needed
             ImGui::EndMainMenuBar();
         }
 
         if(show_save_popup)
         {
-            ImGui::BeginPopup("Save as");
+            //ImGui::BeginPopup("Save as");
             /*
             char filename[80] = {0};
             ImGui::OpenPopup("Save current view", ImGuiPopupFlags_AnyPopup);
@@ -191,7 +209,7 @@ int main(int, char**)
             render_due = true;
         }
 
-        if(ImGui::InputText("f(z)", static_cast<char *>(&text_input[0]), 100))
+        if(ImGui::InputText((error_text[0] ? error_text : "= f(z)"), text_input, 100, ImGuiInputTextFlags_None))
         {
             render_due = true;
         }
@@ -205,7 +223,7 @@ int main(int, char**)
         if(flip_due)
             flip();
         //std::cout << ticks_at_last_render << "\n";
-        if(render_due && (SDL_GetTicks64() - ticks_at_last_render) > 1000)
+        if(render_due && (SDL_GetTicks64() - ticks_at_last_render) > 1000) //render events are at least 1 second apart
             render();
 
         // Rendering
