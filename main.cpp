@@ -13,11 +13,31 @@
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
 #endif
 
+//(I * carg(z) * cabs(z) * exp((cpow(z, 3) + cpow(z, z))))
+//(((cpow(z, 2) - 1)*cpow(z - 2 - I, 2))/(cpow(z, 2) + 2 + 2*I))
+//(0.4*cpow((z), 5) + 3 * cpow(z, 3) - cpow(z, 2) + 5*z)/(cpow(I*z, 5))
+//csin(3*carg(cexp(I *  (cabs(z) - carg(z))))) * cexp(I *  (cabs(z) - carg(z))) //spiral
+//(0.4*cpow((z), 5) + 3 * cpow(z, 3) - cpow(z, 2) + 5*z)
+//z*cexp(I * 2 * carg(z))
+//cpow(z, 2) + 1
+//cpow(M_E, ccos(z))
+//(((cpow(z, 2) - 1)*cpow(z - 2 - I, 2))/(cpow(z, 2) + 2 + 2*I))
+
+const static std::vector<std::pair<char *, char *>> examples({
+    {"6th degree polynomial", "3*z^4-7*z^3+(2/9)+z^2-z+10-34*i*z^6"}, 
+    {"Grid", "cos(imag(z)) + i * sin(real(z))"},
+    {"Zoom-independent function", "10*exp(i*arg(z))"},
+    {"Imaginary roots at +-i", "z^2 + 1"},
+    {"Spiral", "100*(sin(3*arg(exp(i*(abs(z)-arg(z)))))*exp(i*(abs(z)-arg(z))))"},
+    {"Cool pattern", "z^z^sin(exp(cos(z)))"}
+
+});
+
 // Main code
 int main(int, char**)
 {
     // Setup SDL
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
         return -1;
@@ -41,22 +61,12 @@ int main(int, char**)
     SDL_DisplayMode mode;
     SDL_GetCurrentDisplayMode(0, &mode);
     
-    int width = mode.w;
-    int height = mode.h;
-    BitMap image(width, height); //resolution set to max width
-    image.plot_complex_func("z", 10, false, 16);
+
+    BitMap image(mode.w, mode.h); //resolution set to max width
     SDL_Texture* imageTexture = nullptr;
     
-    unsigned char* imageData = image.get_data(); // Initialize with initial data
-    imageTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, width, height);
-    SDL_UpdateTexture(imageTexture, nullptr, imageData, image.get_width() * 3);
-
-    char text_input[100] = {0};
-    /*
-    SDL_RendererInfo info;
-    SDL_GetRendererInfo(renderer, &info);
-    SDL_Log("Current SDL_Renderer: %s", info.name);
-    */
+    imageTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, mode.w, mode.h);
+    SDL_UpdateTexture(imageTexture, nullptr, image.get_data(), image.get_width() * 3);
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -93,8 +103,10 @@ int main(int, char**)
     bool done = false;
     bool flip_due = true;
     bool render_due = true;
-    auto ticks_at_last_render = SDL_GetTicks64();
+    Uint64 ticks_at_last_render = 0;
     float maxval = 10.0;
+    float menuBarHeight = 23; //default value
+    char text_input[100] = {'z', '\0'};
     char error_text[100] = {0};
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -113,6 +125,7 @@ int main(int, char**)
         error_text[0] = 0;
         ticks_at_last_render = SDL_GetTicks64();
         render_due = false; 
+        
     };
 
     auto flip = [&]() {
@@ -132,6 +145,14 @@ int main(int, char**)
 
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
                 done = true;
+
+            if (event.type == SDL_WINDOWEVENT_RESIZED) {
+                image.resize(io.DisplaySize.x, io.DisplaySize.y - 4 * menuBarHeight);
+                SDL_DestroyTexture(imageTexture);
+                imageTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, io.DisplaySize.x, io.DisplaySize.y - 4 * menuBarHeight);
+                render_due = true;
+            }
+
         }
         ImGui_ImplSDLRenderer2_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -150,55 +171,63 @@ int main(int, char**)
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Examples")) {
-                if (ImGui::MenuItem("Spiral")) {
-                    text_input = 
+
+                for(auto& example : examples)
+                {
+                    if(ImGui::MenuItem(example.first)) {
+                        std::strcpy(text_input, example.second);
+                        render_due = true;
+                    }
                 }
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Functions")) {
+                for (auto& str : Parsing::operators) {
+                    if(str.length() > 1) {
+                        if (ImGui::MenuItem((str + "z)").c_str())) {
+                            std::strcpy(text_input, (str + "z)").c_str());
+                            render_due = true;
+                        }
+                    }
+                }
+                ImGui::EndMenu();
             }
             // Add more menus as needed
             ImGui::EndMainMenuBar();
         }
 
-        if(show_save_popup)
-        {
-            //ImGui::BeginPopup("Save as");
-            /*
-            char filename[80] = {0};
-            ImGui::OpenPopup("Save current view", ImGuiPopupFlags_AnyPopup);
-
-            if (ImGui::BeginPopupModal("Save As Popup", &show_save_popup, ImGuiWindowFlags_AlwaysAutoResize)) {
-                ImGui::Text("Filename to save current view");
-                ImGui::InputText("Save", filename, IM_ARRAYSIZE(filename), ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_AlwaysOverwrite);
-
-                if (ImGui::Button("Ok")) {
-                    // Handle save logic here using 'filename'
-                    // For example: image.save_jpeg(filename);
-                    show_save_popup = false; // Close the popup
-                    ImGui::CloseCurrentPopup(); // Close the modal after saving
-                }
-
-                ImGui::SameLine();
-
-                if (ImGui::Button("Cancel")) {
-                    show_save_popup = false; // Close the popup
-                    ImGui::CloseCurrentPopup();
-                }
-                show_save_popup = false;
-                ImGui::EndPopup();
-            }
-            */
+        if(show_save_popup) {
+            ImGui::OpenPopup("Save current view as JPEG");
         }
 
-        float menuBarHeight = ImGui::GetFrameHeightWithSpacing(); // Height of the menu bar
+        if(ImGui::BeginPopupModal("Save current view as JPEG", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            
+
+            char filename[80] = {0};
+            ImGui::Text("Save as...");
+            ImGui::SameLine();
+            if (ImGui::InputText("##", filename, IM_ARRAYSIZE(filename), ImGuiInputTextFlags_EnterReturnsTrue)) {
+                image.save_jpeg(filename);
+                ImGui::CloseCurrentPopup();
+                show_save_popup = false;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel")) {
+                ImGui::CloseCurrentPopup();
+                show_save_popup = false; // Close the popup
+            }
+            // End the popup modal
+            ImGui::EndPopup();
+        }
+
+        menuBarHeight = ImGui::GetFrameHeightWithSpacing(); // Height of the menu bar
         ImGui::SetNextWindowPos(ImVec2(0, menuBarHeight));
         auto img_size = ImVec2(io.DisplaySize.x, io.DisplaySize.y - menuBarHeight * 4);
         ImGui::SetNextWindowSize(img_size); // Exclude menu bar and text input heights
-        //image.resize(img_size.x, img_size.y);
         ImGui::Begin("Image Display", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
         ImGui::Image((void*)(intptr_t)imageTexture, img_size);
         ImGui::End();
         //ImGui::ShowMetricsWindow(); //debugging
-        //ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - menuBarHeight * 3)); // Docked at the bottom
-        //ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, menuBarHeight));
 
         ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - menuBarHeight * 3));
         ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, menuBarHeight * 3));
@@ -209,7 +238,7 @@ int main(int, char**)
             render_due = true;
         }
 
-        if(ImGui::InputText((error_text[0] ? error_text : "= f(z)"), text_input, 100, ImGuiInputTextFlags_None))
+        if(ImGui::InputText((error_text[0] ? error_text : "= f(z)"), text_input, 100, ImGuiInputTextFlags_EnterReturnsTrue))
         {
             render_due = true;
         }
@@ -222,8 +251,8 @@ int main(int, char**)
 
         if(flip_due)
             flip();
-        //std::cout << ticks_at_last_render << "\n";
-        if(render_due && (SDL_GetTicks64() - ticks_at_last_render) > 1000) //render events are at least 1 second apart
+
+        if(render_due && (SDL_GetTicks64() - ticks_at_last_render) > 1500) //render events are at least 1 second apart
             render();
 
         // Rendering
