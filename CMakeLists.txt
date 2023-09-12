@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 project(imgui-test2)
 
 
-add_executable(test 
+add_executable(CPlot 
     "main.cpp" 
     "imgui/imgui.cpp" 
     "imgui/imgui_draw.cpp" 
@@ -14,8 +14,8 @@ add_executable(test
     "libcplot/src/toojpeg.cpp"
 )
 
-include_directories(test imgui imgui/backends libcplot/include libcplot/include/expr_parsing_cpp/src)
+include_directories(imgui imgui/backends libcplot/include libcplot/include/expr_parsing_cpp/src /usr/include/SDL2)
 
-add_compile_options(-Og -I/usr/include/SDL2 -D_REENTRANT)
-target_link_libraries(test SDL2)
+add_compile_options(-O3 -D_REENTRANT)
+target_link_libraries(CPlot SDL2)
 
