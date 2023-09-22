@@ -103,11 +103,13 @@ int main(int, char**)
     bool done = false;
     bool flip_due = true;
     bool render_due = true;
+    bool dark_mode = true;
     Uint64 ticks_at_last_render = 0;
     float maxval = 10.0;
     float menuBarHeight = 23; //default value
     char text_input[100] = {'z', '\0'};
     char error_text[100] = {0};
+    int framerate = 144;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     //rendering and image flip callbacks
@@ -156,6 +158,9 @@ int main(int, char**)
         }
         ImGui_ImplSDLRenderer2_NewFrame();
         ImGui_ImplSDL2_NewFrame();
+        if(dark_mode) {
+            ImGui::StyleColorsDark();
+        } else ImGui::StyleColorsLight();
         ImGui::NewFrame();       
         
         // Main menu bar
@@ -192,6 +197,15 @@ int main(int, char**)
                 }
                 ImGui::EndMenu();
             }
+            if(ImGui::BeginMenu("Framerate")) {
+                std::vector<int> options = {24, 30, 60, 144};
+                for(auto& o : options) {
+                    if(ImGui::MenuItem(std::to_string(o).c_str())) {
+                        framerate = o;
+                    }
+                }
+                ImGui::EndMenu();
+            }
             // Add more menus as needed
             ImGui::EndMainMenuBar();
         }
@@ -220,6 +234,7 @@ int main(int, char**)
             ImGui::EndPopup();
         }
 
+
         menuBarHeight = ImGui::GetFrameHeightWithSpacing(); // Height of the menu bar
         ImGui::SetNextWindowPos(ImVec2(0, menuBarHeight));
         auto img_size = ImVec2(io.DisplaySize.x, io.DisplaySize.y - menuBarHeight * 4);
@@ -243,7 +258,10 @@ int main(int, char**)
             render_due = true;
         }
 
-        if(!(SDL_GetTicks64() % (1000 / 144))) //1000 ms per second divided by framerate is the time between refreshing ticks
+        ImGui::SameLine(ImGui::GetWindowWidth() - 100);
+        ImGui::Checkbox("Dark Mode", &dark_mode);
+
+        if(!(SDL_GetTicks64() % (1000 / framerate))) //1000 ms per second divided by framerate is the time between refreshing ticks
         {
             flip_due = true;
         }
