@@ -49,7 +49,7 @@ int main(int, char**)
 #endif
 
     // Create window with SDL_Renderer graphics context
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    auto window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     SDL_Window* window = SDL_CreateWindow("CPlot", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     if (renderer == nullptr)
@@ -98,6 +98,9 @@ int main(int, char**)
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != nullptr);
 */
+
+    auto font_calibri = io.Fonts->AddFontFromFileTTF("../assets/fonts/calibri.ttf", 16.0f);
+    assert(font_calibri);
     
 
     bool done = false;
@@ -110,6 +113,7 @@ int main(int, char**)
     char text_input[100] = {'z', '\0'};
     char error_text[100] = {0};
     int framerate = 144;
+    auto ticks_per_frame = 1000 / 144;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     //rendering and image flip callbacks
@@ -258,7 +262,7 @@ int main(int, char**)
             render_due = true;
         }
 
-        ImGui::SameLine(ImGui::GetWindowWidth() - 100);
+        ImGui::SameLine(io.DisplaySize.x - 100);
         ImGui::Checkbox("Dark Mode", &dark_mode);
 
         if(!(SDL_GetTicks64() % (1000 / framerate))) //1000 ms per second divided by framerate is the time between refreshing ticks
