@@ -1,0 +1,1 @@
+-I"/home/davidl09/C++/imgui-cplx-plot/imgui" -I"/home/davidl09/C++/imgui-cplx-plot/imgui/backends" -I"/home/davidl09/C++/imgui-cplx-plot/libcplot/include" -I"/home/davidl09/C++/imgui-cplx-plot/libcplot/include/expr_parsing_cpp/src" -I/usr/include/SDL2
