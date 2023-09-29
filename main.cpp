@@ -107,6 +107,7 @@ int main(int, char**)
     bool flip_due = true;
     bool render_due = true;
     bool dark_mode = true;
+    bool multithreading = true;
     Uint64 ticks_at_last_render = 0;
     float maxval = 10.0;
     float menuBarHeight = 23; //default value
@@ -120,7 +121,7 @@ int main(int, char**)
     auto render = [&]()
     {
         try{
-            image.plot_complex_func(std::string(text_input), static_cast<double>(maxval), false, std::thread::hardware_concurrency()); 
+            image.plot_complex_func(std::string(text_input), static_cast<double>(maxval), false, (multithreading ? std::thread::hardware_concurrency() : 1));
         }
         catch(std::invalid_argument& e)
         {
@@ -179,17 +180,7 @@ int main(int, char**)
                 }
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Examples")) {
 
-                for(auto& example : examples)
-                {
-                    if(ImGui::MenuItem(example.first)) {
-                        std::strcpy(text_input, example.second);
-                        render_due = true;
-                    }
-                }
-                ImGui::EndMenu();
-            }
             if (ImGui::BeginMenu("Functions")) {
                 for (auto& str : Parsing::operators) {
                     if(str.length() > 1) {
@@ -201,6 +192,19 @@ int main(int, char**)
                 }
                 ImGui::EndMenu();
             }
+
+            if (ImGui::BeginMenu("Examples")) {
+
+                for(auto& example : examples)
+                {
+                    if(ImGui::MenuItem(example.first)) {
+                        std::strcpy(text_input, example.second);
+                        render_due = true;
+                    }
+                }
+                ImGui::EndMenu();
+            }
+            /*
             if(ImGui::BeginMenu("Framerate")) {
                 std::vector<int> options = {24, 30, 60, 144};
                 for(auto& o : options) {
@@ -210,6 +214,7 @@ int main(int, char**)
                 }
                 ImGui::EndMenu();
             }
+             */
             // Add more menus as needed
             ImGui::EndMainMenuBar();
         }
@@ -262,11 +267,13 @@ int main(int, char**)
             render_due = true;
         }
 
-        ImGui::SameLine(io.DisplaySize.x - 100);
+        ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 250);
         ImGui::Checkbox("Dark Mode", &dark_mode);
+        ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 125);
+        ImGui::Checkbox("Multithreading", &multithreading);
 
         if(!(SDL_GetTicks64() % (1000 / framerate))) //1000 ms per second divided by framerate is the time between refreshing ticks
-        {
+        {                                            // Is broken but works for now
             flip_due = true;
         }
         ImGui::End();
