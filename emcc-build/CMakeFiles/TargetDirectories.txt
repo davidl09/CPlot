@@ -1,3 +1,0 @@
-/home/davidl09/C++/imgui-cplx-plot/emcc-build/CMakeFiles/CPlot.dir
-/home/davidl09/C++/imgui-cplx-plot/emcc-build/CMakeFiles/edit_cache.dir
-/home/davidl09/C++/imgui-cplx-plot/emcc-build/CMakeFiles/rebuild_cache.dir
