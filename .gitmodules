@@ -1,8 +1,8 @@
 [submodule "imgui"]
-	path = imgui
+	path = deps/imgui
 	url = https://github.com/ocornut/imgui
 	branch = docking
 [submodule "libcplot"]
-	path = libcplot
+	path = deps/libcplot
 	url = https://github.com/davidl09/Complex-plot
 	branch = lib
