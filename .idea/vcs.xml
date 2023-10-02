@@ -2,8 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/imgui" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/libcplot" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/libcplot/include/expr_parsing_cpp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/imgui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/libcplot" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/libcplot/include/expr_parsing_cpp" vcs="Git" />
   </component>
 </project>
