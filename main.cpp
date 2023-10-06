@@ -83,8 +83,9 @@ int main(int, char**)
     ImGui_ImplSDLRenderer2_Init(renderer);
 
 
-    auto font_calibri = io.Fonts->AddFontFromFileTTF("../assets/fonts/calibri.ttf", 16.0f);
+    auto font_calibri = io.Fonts->AddFontFromFileTTF("../../assets/fonts/calibri.ttf", 16.0f);
     assert(font_calibri);
+    ImGui::PushFont(font_calibri);
     
 
     bool done = false;
