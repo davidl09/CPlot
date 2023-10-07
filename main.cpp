@@ -23,7 +23,7 @@
 //cpow(M_E, ccos(z))
 //(((cpow(z, 2) - 1)*cpow(z - 2 - I, 2))/(cpow(z, 2) + 2 + 2*I))
 
-const static std::vector<std::pair<char *, char *>> examples({
+const static std::vector<std::pair<std::string, std::string>> examples({
     {"6th degree polynomial", "3*z^4-7*z^3+(2/9)+z^2-z+10-34*i*z^6"}, 
     {"Grid", "cos(imag(z)) + i * sin(real(z))"},
     {"Zoom-independent function", "10*exp(i*arg(z))"},
@@ -181,8 +181,8 @@ int main(int, char**)
 
                 for(auto& example : examples)
                 {
-                    if(ImGui::MenuItem(example.first)) {
-                        std::strcpy(text_input, example.second);
+                    if(ImGui::MenuItem(example.first.c_str())) {
+                        std::strcpy(text_input, example.second.c_str());
                         render_due = true;
                     }
                 }
