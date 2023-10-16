@@ -21,6 +21,6 @@ target_link_libraries(CPlot
         libcplot
         ${SDL2_LIBRARIES}
         pthread
-        #tbb
+
 )
 
