@@ -98,7 +98,7 @@ int main(int, char**)
     char text_input[100] = {'z', '\0'};
     char error_text[100] = {0};
     int framerate = 144;
-    auto ticks_per_frame = 1000 / 144;
+    //auto ticks_per_frame = 1000 / 144;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     //rendering and image flip callbacks
