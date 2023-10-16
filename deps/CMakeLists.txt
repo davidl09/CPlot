@@ -1,7 +1,3 @@
-add_subdirectory(tbb)
-find_package(TBB REQUIRED tbb)
-find_package(SDL2 REQUIRED)
-
 add_library(
         imgui STATIC
         "imgui/imgui.cpp"
