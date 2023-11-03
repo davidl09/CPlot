@@ -27,7 +27,6 @@ if (NOT MSVC)
         target_link_libraries(
                 CPlot PUBLIC 
                 pthread
-                tbb
         )
 endif()
 
