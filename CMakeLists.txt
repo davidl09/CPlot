@@ -3,8 +3,6 @@ project(imgui-test2)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-
 add_subdirectory(deps)
 
 add_executable(CPlot WIN32
@@ -30,3 +28,24 @@ if (NOT MSVC)
         )
 endif()
 
+install(
+        TARGETS CPlot
+)
+
+set(CPACK_GENERATOR "TBZ2")
+set(CPACK_SOURCE_GENERATOR "TBZ2")
+set(CPACK_PACKAGE_DIRECTORY ${PROJECT_BINARY_DIR}/package)
+
+set(
+        CPACK_SOURCE_IGNORE_FILES
+        .git/
+        .github/
+        .vscode/
+        cmake-build-debug/
+        cmake-build-release/
+        deps/
+        .gitignore
+        .gitmodules
+        imgui.ini
+        main.cpp
+)
