@@ -95,6 +95,7 @@ int main(int, char**)
     bool render_due = true;
     bool dark_mode = true;
     bool multithreading = true;
+    bool resizeDue = true;
     Uint64 ticks_at_last_render = 0;
     float maxval = 10.0;
     float menuBarHeight = 23; //default value
@@ -103,6 +104,7 @@ int main(int, char**)
     int framerate = 144;
     //auto ticks_per_frame = 1000 / 144;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec2 imageDisplaySize{io.DisplaySize.x, io.DisplaySize.y};
 
     //rendering and image flip callbacks
     auto render = [&]()
@@ -133,6 +135,13 @@ int main(int, char**)
         
     };
 
+    auto adjustSize = [&]() {
+        image.resize(static_cast<int>(imageDisplaySize.x), static_cast<int>(imageDisplaySize.y));
+        SDL_DestroyTexture(imageTexture);
+        imageTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, static_cast<int>(imageDisplaySize.x), static_cast<int>(imageDisplaySize.y));
+        resizeDue = false;
+    };
+
     auto flip = [&]() {
         SDL_UpdateTexture(imageTexture, nullptr, image.get_data(), image.get_width() * 3);  
         flip_due = false;
@@ -151,11 +160,9 @@ int main(int, char**)
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
                 done = true;
 
-            if (event.type == SDL_WINDOWEVENT_RESIZED) {
-                image.resize(io.DisplaySize.x, io.DisplaySize.y - 4 * menuBarHeight);
-                SDL_DestroyTexture(imageTexture);
-                imageTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, io.DisplaySize.x, io.DisplaySize.y - 4 * menuBarHeight);
+            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
                 render_due = true;
+                resizeDue = true;
             }
 
         }
@@ -246,12 +253,14 @@ int main(int, char**)
 
         menuBarHeight = ImGui::GetFrameHeightWithSpacing(); // Height of the menu bar
         ImGui::SetNextWindowPos(ImVec2(0, menuBarHeight));
-        auto img_size = ImVec2(io.DisplaySize.x, io.DisplaySize.y - menuBarHeight * 4);
-        ImGui::SetNextWindowSize(img_size); // Exclude menu bar and text input heights
+        imageDisplaySize = {io.DisplaySize.x, io.DisplaySize.y - menuBarHeight * 4};
+        if (resizeDue) {
+            adjustSize();
+        }
+        ImGui::SetNextWindowSize(imageDisplaySize); // Exclude menu bar and text input heights
         ImGui::Begin("Image Display", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
-        ImGui::Image((void*)(intptr_t)imageTexture, img_size);
+        ImGui::Image((void*)(intptr_t)imageTexture, imageDisplaySize);
         ImGui::End();
-        //ImGui::ShowMetricsWindow(); //debugging
 
         ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - menuBarHeight * 3));
         ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, menuBarHeight * 3));
