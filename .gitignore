@@ -1,3 +1,4 @@
 build/
 *.ini
 .vscode/
+cmake-build-debug/

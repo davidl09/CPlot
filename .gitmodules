@@ -6,3 +6,7 @@
 	path = deps/libcplot
 	url = https://github.com/davidl09/Complex-plot
 	branch = lib
+[submodule "deps/SDL"]
+	path = deps/SDL
+	url = git@github.com:libsdl-org/SDL.git
+	branch = SDL2

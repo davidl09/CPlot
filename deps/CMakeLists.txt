@@ -1,3 +1,7 @@
+add_subdirectory(SDL)
+
+find_package(SDL2 REQUIRED)
+
 add_library(
         imgui STATIC
         "imgui/imgui.cpp"
@@ -12,13 +16,24 @@ target_include_directories(
         imgui PUBLIC
         "imgui"
         "imgui/backends"
-        "/usr/include/SDL2"
+        SDL2::SDL2_INCLUDE_DIR
+        
+)
+
+target_link_libraries(
+        imgui PUBLIC
+        SDL2::SDL2-static
 )
 
 add_library(
         libcplot STATIC
         "libcplot/src/libcplot.cpp"
         "libcplot/src/toojpeg.cpp"
+)
+
+target_compile_options(
+        libcplot PUBLIC
+        -std=c++20
 )
 
 target_include_directories(
