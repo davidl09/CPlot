@@ -275,9 +275,9 @@ int main(int, char**)
             render_due = true;
         }
 
-        ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 250);
+        ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 250);
         ImGui::Checkbox("Dark Mode", &dark_mode);
-        ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 125);
+        ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 125);
         ImGui::Checkbox("Multithreading", &multithreading);
 
         if(ImGui::InputText((error_text[0] ? error_text : "= f(z)"), text_input, 100, ImGuiInputTextFlags_EnterReturnsTrue))
