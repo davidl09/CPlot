@@ -36,7 +36,7 @@ const static std::vector<std::pair<const char *, const char *>> examples({
 // Main code
 #ifdef WIN32
 int WinMain(int, char**) 
-#elif
+#else
 int main(int, char**)
 #endif
 {
