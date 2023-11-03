@@ -23,7 +23,7 @@
 //cpow(M_E, ccos(z))
 //(((cpow(z, 2) - 1)*cpow(z - 2 - I, 2))/(cpow(z, 2) + 2 + 2*I))
 
-const static std::vector<std::pair<char *, char *>> examples({
+const static std::vector<std::pair<const char *, const char *>> examples({
     {"6th degree polynomial", "3*z^4-7*z^3+(2/9)+z^2-z+10-34*i*z^6"}, 
     {"Grid", "cos(imag(z)) + i * sin(real(z))"},
     {"Zoom-independent function", "10*exp(i*arg(z))"},
@@ -47,6 +47,7 @@ int main(int, char**)
 #ifdef SDL_HINT_IME_SHOW_UI
     SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
 #endif
+
 
     // Create window with SDL_Renderer graphics context
     auto window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
@@ -84,7 +85,9 @@ int main(int, char**)
 
 
     auto font_calibri = io.Fonts->AddFontFromFileTTF("../assets/fonts/calibri.ttf", 16.0f);
-    assert(font_calibri);
+    if (font_calibri == nullptr) {
+        abort();
+    }
     
 
     bool done = false;
@@ -104,14 +107,25 @@ int main(int, char**)
     //rendering and image flip callbacks
     auto render = [&]()
     {
-        try{
-            image.plot_complex_func(std::string(text_input), static_cast<double>(maxval), false, (multithreading ? static_cast<int>(std::thread::hardware_concurrency()) : 1));
+        Expression<std::complex<double>> expr;
+        try {
+            expr.checkInitWithExcept(text_input);
+            expr.evaluate({
+                        {"z", {0, 0}}, 
+                        {"i", {0, 1}},
+                        {"e", {std::numbers::e, 0}},
+                        {"pi", {std::numbers::pi}}
+                                                                                                    
+                    });
+
         }
-        catch(std::invalid_argument& e)
-        {
+        catch(std::exception& e) {
             std::strcpy(error_text, e.what());
+            render_due = false;
             return;
         }
+
+        image.plot_complex(expr, static_cast<double>(maxval), false, multithreading ? static_cast<int>(std::thread::hardware_concurrency()) : 1);
 
         error_text[0] = 0;
         ticks_at_last_render = SDL_GetTicks64();
@@ -166,10 +180,12 @@ int main(int, char**)
             }
 
             if (ImGui::BeginMenu("Functions")) {
-                for (auto& str : Parsing::operators) {
-                    if(str.length() > 1) {
-                        if (ImGui::MenuItem((str + "z)").c_str())) {
-                            std::strcpy(text_input, (str + "z)").c_str());
+                Expression<std::complex<double>> temp;
+                for (auto& func : temp.getUnaryFuncs()) {
+                    if(func.first.length() > 1) {
+                        if (ImGui::MenuItem(&func.first[0])) {
+                            std::strcpy(text_input, &func.first[0]);
+                            std::strcat(text_input, "(z)");
                             render_due = true;
                         }
                     }
@@ -246,15 +262,15 @@ int main(int, char**)
             render_due = true;
         }
 
-        if(ImGui::InputText((error_text[0] ? error_text : "= f(z)"), text_input, 100, ImGuiInputTextFlags_EnterReturnsTrue))
-        {
-            render_due = true;
-        }
-
         ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 250);
         ImGui::Checkbox("Dark Mode", &dark_mode);
         ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 125);
         ImGui::Checkbox("Multithreading", &multithreading);
+
+        if(ImGui::InputText((error_text[0] ? error_text : "= f(z)"), text_input, 100, ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            render_due = true;
+        }
 
         if(!(SDL_GetTicks64() % (1000 / framerate))) //1000 ms per second divided by framerate is the time between refreshing ticks
         {                                            // Is broken but works for now

@@ -39,6 +39,6 @@ target_compile_options(
 target_include_directories(
         libcplot PUBLIC
         "libcplot/include"
-        "libcplot/include/expr_parsing_cpp/src"
+        "libcplot/include/astParser/include"
 )
 
