@@ -1,9 +1,5 @@
 add_subdirectory(SDL)
 
-if (NOT MSVC) 
-        find_package(SDL2 REQUIRED)
-endif()
-
 add_library(
         imgui STATIC
         "imgui/imgui.cpp"
