@@ -1,6 +1,8 @@
 add_subdirectory(SDL)
 
-find_package(SDL2 REQUIRED)
+if (NOT MSVC) 
+        find_package(SDL2 REQUIRED)
+endif()
 
 add_library(
         imgui STATIC
@@ -29,11 +31,6 @@ add_library(
         libcplot STATIC
         "libcplot/src/libcplot.cpp"
         "libcplot/src/toojpeg.cpp"
-)
-
-target_compile_options(
-        libcplot PUBLIC
-        -std=c++20
 )
 
 target_include_directories(

@@ -34,7 +34,11 @@ const static std::vector<std::pair<const char *, const char *>> examples({
 });
 
 // Main code
+#ifdef WIN32
+int WinMain(int, char**) 
+#elif
 int main(int, char**)
+#endif
 {
     // Setup SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -84,7 +88,7 @@ int main(int, char**)
     ImGui_ImplSDLRenderer2_Init(renderer);
 
 
-    auto font_calibri = io.Fonts->AddFontFromFileTTF("../assets/fonts/calibri.ttf", 16.0f);
+    auto font_calibri = io.Fonts->AddFontFromFileTTF("../../assets/fonts/calibri.ttf", 16.0f);
     if (font_calibri == nullptr) {
         abort();
     }
