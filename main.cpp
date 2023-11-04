@@ -28,6 +28,7 @@ const static std::vector<std::pair<const char *, const char *>> examples({
     {"6th degree polynomial", "3*z^4-7*z^3+(2/9)+z^2-z+10-34*i*z^6"}, 
     {"Grid", "cos(imag(z)) + i * sin(real(z))"},
     {"Zoom-independent function", "10*exp(i*arg(z))"},
+    {"Radial Symmetry", "10*exp(i*abs(z))"},
     {"Imaginary roots at +-i", "z^2 + 1"},
     {"Spiral", "100*(sin(3*arg(exp(i*(abs(z)-arg(z)))))*exp(i*(abs(z)-arg(z))))"},
     {"Exponential with cubic argument", "exp(z^3 + z^z)"},
@@ -36,7 +37,7 @@ const static std::vector<std::pair<const char *, const char *>> examples({
 });
 
 // Main code
-#ifdef WIN32
+#ifdef WIN32 || _WIN32
 int WinMain(int, char**) 
 #else
 int main(int, char**)
