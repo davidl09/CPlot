@@ -90,7 +90,7 @@ int main(int, char**)
 
     auto font_calibri = io.Fonts->AddFontFromFileTTF("../assets/fonts/calibri.ttf", 16.0f);
     if (font_calibri == nullptr) {
-        abort();
+        font_calibri = io.Fonts->AddFontFromFileTTF("../../assets/fonts/calibri.ttf", 16.0f);
     }
     
 
