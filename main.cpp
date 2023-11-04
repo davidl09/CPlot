@@ -13,16 +13,6 @@
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
 #endif
 
-//(I * carg(z) * cabs(z) * exp((cpow(z, 3) + cpow(z, z))))
-//(((cpow(z, 2) - 1)*cpow(z - 2 - I, 2))/(cpow(z, 2) + 2 + 2*I))
-//(0.4*cpow((z), 5) + 3 * cpow(z, 3) - cpow(z, 2) + 5*z)/(cpow(I*z, 5))
-//csin(3*carg(cexp(I *  (cabs(z) - carg(z))))) * cexp(I *  (cabs(z) - carg(z))) //spiral
-//(0.4*cpow((z), 5) + 3 * cpow(z, 3) - cpow(z, 2) + 5*z)
-//z*cexp(I * 2 * carg(z))
-//cpow(z, 2) + 1
-//cpow(M_E, ccos(z))
-//(((cpow(z, 2) - 1)*cpow(z - 2 - I, 2))/(cpow(z, 2) + 2 + 2*I))
-
 const static std::vector<std::pair<const char *, const char *>> examples({
     {"5th degree polynomial", "0.4z^5+3z^3-z^2+5z"},
     {"6th degree polynomial", "3*z^4-7*z^3+(2/9)+z^2-z+10-34*i*z^6"}, 
@@ -37,7 +27,7 @@ const static std::vector<std::pair<const char *, const char *>> examples({
 });
 
 // Main code
-#ifdef WIN32 || _WIN32
+#if defined(WIN32) || defined(_WIN32)
 int WinMain(int, char**) 
 #else
 int main(int, char**)
@@ -109,6 +99,7 @@ int main(int, char**)
     char text_input[100] = {'z', '\0'};
     char error_text[100] = {0};
     int framerate = 144;
+    Expression<std::complex<double>> expr;
     //auto ticks_per_frame = 1000 / 144;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     ImVec2 imageDisplaySize{io.DisplaySize.x, io.DisplaySize.y};
@@ -116,7 +107,6 @@ int main(int, char**)
     //rendering and image flip callbacks
     auto render = [&]()
     {
-        Expression<std::complex<double>> expr;
         try {
             expr.checkInitWithExcept(text_input);
             expr.evaluate({
@@ -194,8 +184,7 @@ int main(int, char**)
             }
 
             if (ImGui::BeginMenu("Functions")) {
-                Expression<std::complex<double>> temp;
-                for (auto& func : temp.getUnaryFuncs()) {
+                for (auto& func : expr.getUnaryFuncs()) {
                     if(func.first.length() > 1) {
                         if (ImGui::MenuItem(&func.first[0])) {
                             std::strcpy(text_input, &func.first[0]);
