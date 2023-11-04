@@ -24,11 +24,13 @@
 //(((cpow(z, 2) - 1)*cpow(z - 2 - I, 2))/(cpow(z, 2) + 2 + 2*I))
 
 const static std::vector<std::pair<const char *, const char *>> examples({
+    {"5th degree polynomial", "0.4z^5+3z^3-z^2+5z"},
     {"6th degree polynomial", "3*z^4-7*z^3+(2/9)+z^2-z+10-34*i*z^6"}, 
     {"Grid", "cos(imag(z)) + i * sin(real(z))"},
     {"Zoom-independent function", "10*exp(i*arg(z))"},
     {"Imaginary roots at +-i", "z^2 + 1"},
     {"Spiral", "100*(sin(3*arg(exp(i*(abs(z)-arg(z)))))*exp(i*(abs(z)-arg(z))))"},
+    {"Exponential with cubic argument", "exp(z^3 + z^z)"},
     {"Cool pattern", "z^z^sin(exp(cos(z)))"}
 
 });
