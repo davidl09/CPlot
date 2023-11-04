@@ -30,22 +30,11 @@ endif()
 
 install(
         TARGETS CPlot
+        DESTINATION ${CMAKE_SOURCE_DIR}/package
+)
+install(
+        DIRECTORY assets
+        DESTINATION ${CMAKE_SOURCE_DIR}/package
 )
 
-set(CPACK_GENERATOR "TBZ2")
-set(CPACK_SOURCE_GENERATOR "TBZ2")
-set(CPACK_PACKAGE_DIRECTORY ${PROJECT_BINARY_DIR}/package)
-
-set(
-        CPACK_SOURCE_IGNORE_FILES
-        .git/
-        .github/
-        .vscode/
-        cmake-build-debug/
-        cmake-build-release/
-        deps/
-        .gitignore
-        .gitmodules
-        imgui.ini
-        main.cpp
-)
+include(CPackConfig.cmake)
