@@ -27,7 +27,7 @@ const static std::vector<std::pair<const char *, const char *>> examples({
 });
 
 // Main code
-#if defined(WIN32) || defined(_WIN32)
+#ifdef WIN32
 int WinMain(int, char**) 
 #else
 int main(int, char**)
@@ -84,6 +84,9 @@ int main(int, char**)
     auto font_calibri = io.Fonts->AddFontFromFileTTF("../assets/fonts/calibri.ttf", 16.0f);
     if (font_calibri == nullptr) {
         font_calibri = io.Fonts->AddFontFromFileTTF("../../assets/fonts/calibri.ttf", 16.0f);
+        if (font_calibri == nullptr) {
+            io.Fonts->AddFontDefault();
+        }
     }
     
 

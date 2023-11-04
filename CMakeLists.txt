@@ -7,9 +7,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 add_subdirectory(deps)
 
-add_executable(CPlot
-    "main.cpp"
-)
+if(WIN32)
+        add_executable(CPlot WIN32
+        "main.cpp"
+        )
+else()
+        add_executable(CPlot 
+        "main.cpp"
+        )
+endif()
+
 
 target_include_directories(
         CPlot PUBLIC
