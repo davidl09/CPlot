@@ -9,6 +9,8 @@
 #include <string>
 #include <cstring>
 
+#include "portable-file-dialogs.h"
+
 #if !SDL_VERSION_ATLEAST(2,0,17)
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
 #endif
@@ -63,19 +65,6 @@ int main(int, char**)
     
     SDL_DisplayMode mode;
     SDL_GetCurrentDisplayMode(0, &mode);
-
-// #ifdef _WIN32 //set icon with windows api
-//     SDL_SysWMinfo wmInfo;
-//     SDL_VERSION(&wmInfo.version);
-//     SDL_GetWindowWMInfo(window, &wmInfo);
-//     HWND hwnd = wmInfo.info.win.window;
-//     HICON hIcon = static_cast<HICON>(LoadImage(hInstance, "..\\assets\\icons\\cplot.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE));
-
-//     if (hIcon) {
-//         SendMessage(hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIcon));
-//         SendMessage(hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hIcon));
-//     }
-// #endif
     
 
     BitMap image(mode.w, mode.h); //resolution set to max width
@@ -199,7 +188,14 @@ int main(int, char**)
                     // Handle open action
                 }
                 if (ImGui::MenuItem("Save As")) {
-                    show_save_popup = true;
+                    auto f = pfd::save_file(
+                        "Save CPlot Output", 
+                        pfd::path::home(),
+                        {"JPEG", "*.jpg *.jpeg"},
+                        pfd::opt::force_overwrite
+                    );
+                    if (f.ready())
+                        image.save_jpeg(f.result());
                 }
                 if (ImGui::MenuItem("Quit")) {
                     break;

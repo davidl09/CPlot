@@ -6,7 +6,6 @@ cmake-build-release/
 bin/
 .vs/
 *.json
-*.nsi
 Release 
 Debug 
 *.o

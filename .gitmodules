@@ -10,3 +10,6 @@
 	path = deps/SDL
 	url = https://github.com/libsdl-org/SDL.git
 	branch = SDL2
+[submodule "deps/portable-file-dialogs"]
+	path = deps/portable-file-dialogs
+	url = https://github.com/samhocevar/portable-file-dialogs.git

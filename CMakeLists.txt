@@ -32,7 +32,11 @@ endif()
 target_include_directories(
         CPlot PUBLIC
         SDL2::SDL2_INCLUDE_DIR
+        "${PORTABLE_FILE_LIB_INCLUDE}"
 )
+
+message("Include: ${PORTABLE_FILE_LIB_INCLUDE}")
+
 
 target_link_libraries(
         CPlot PUBLIC

@@ -1,5 +1,11 @@
 add_subdirectory(SDL)
 
+set(
+        PORTABLE_FILE_LIB_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/portable-file-dialogs"
+        PARENT_SCOPE
+)
+
+
 add_library(
         imgui STATIC
         "imgui/imgui.cpp"
