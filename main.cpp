@@ -103,6 +103,7 @@ int main(int, char**)
     bool dark_mode = true;
     bool multithreading = true;
     bool resizeDue = true;
+    std::string saveAsFile;
     Uint64 ticks_at_last_render = 0;
     float maxval = 10.0;
     float menuBarHeight = 23; //default value
@@ -154,6 +155,11 @@ int main(int, char**)
         flip_due = false;
     };
 
+    auto saveOutput = [&]() {
+        image.save_jpeg(saveAsFile);
+        saveAsFile.erase();
+    };
+
     bool show_save_popup = false;
     while (!done) //main loop
     {
@@ -178,24 +184,25 @@ int main(int, char**)
         if(dark_mode) {
             ImGui::StyleColorsDark();
         } else ImGui::StyleColorsLight();
-        ImGui::NewFrame();       
-        
-        // Main menu bar
+        ImGui::NewFrame();
+
+        if (!saveAsFile.empty()) {
+            saveOutput();
+        }
         
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open")) {
                     // Handle open action
                 }
-                if (ImGui::MenuItem("Save As")) {
-                    auto f = pfd::save_file(
-                        "Save CPlot Output", 
+                if (ImGui::MenuItem("Save as...")) {
+                    saveAsFile = pfd::save_file(
+                        "Save CPlot Output",
                         pfd::path::home(),
-                        {"JPEG", "*.jpg *.jpeg"},
+                        {"Jpeg Images (*.jpg, *.jpg)", "*.jpg"},
                         pfd::opt::force_overwrite
-                    );
-                    if (f.ready())
-                        image.save_jpeg(f.result());
+                    ).result();
+                    
                 }
                 if (ImGui::MenuItem("Quit")) {
                     break;

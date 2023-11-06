@@ -7,6 +7,6 @@
     <mapping directory="$PROJECT_DIR$/deps/libcplot" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/deps/libcplot/include/astParser" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/deps/libcplot/include/astParser/extern/pybind11" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/deps/libcplot/include/expr_parsing_cpp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/portable-file-dialogs" vcs="Git" />
   </component>
 </project>
