@@ -183,6 +183,9 @@ int main(int, char**)
                 if (ImGui::MenuItem("Save As")) {
                     show_save_popup = true;
                 }
+                if (ImGui::MenuItem("Quit")) {
+                    break;
+                }
                 ImGui::EndMenu();
             }
 
@@ -289,7 +292,7 @@ int main(int, char**)
         if(flip_due)
             flip();
 
-        if(render_due && (SDL_GetTicks64() - ticks_at_last_render) > 1500) //render events are at least 1 second apart
+        if(render_due && (SDL_GetTicks64() - ticks_at_last_render) > 250) //render events are at least 1 second apart
             render();
 
         // Rendering
