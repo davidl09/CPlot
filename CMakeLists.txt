@@ -3,7 +3,11 @@ project(CPlot-Plotter)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+if (WIN32)
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+else()
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+endif()
 
 set(PROJECT_VER_PATCH 0)
 set(PROJECT_VER_MINOR 1)
@@ -16,6 +20,7 @@ add_subdirectory(deps)
 if(WIN32)
         add_executable(CPlot WIN32
         "main.cpp"
+        "assets/icon.rc"
         )
 else()
         add_executable(CPlot 

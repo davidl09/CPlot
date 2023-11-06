@@ -7,3 +7,7 @@ bin/
 .vs/
 *.json
 *.nsi
+Release 
+Debug 
+*.o
+

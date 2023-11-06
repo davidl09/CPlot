@@ -13,6 +13,11 @@
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
 #endif
 
+#ifdef _WIN32
+#include <Windows.h>
+#include <SDL2/SDL_syswm.h>
+#endif
+
 const static std::vector<std::pair<const char *, const char *>> examples({
     {"5th degree polynomial", "0.4z^5+3z^3-z^2+5z"},
     {"6th degree polynomial", "3*z^4-7*z^3+(2/9)+z^2-z+10-34*i*z^6"}, 
@@ -27,8 +32,8 @@ const static std::vector<std::pair<const char *, const char *>> examples({
 });
 
 // Main code
-#ifdef WIN32
-int WinMain(int, char**) 
+#ifdef _WIN32
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) 
 #else
 int main(int, char**)
 #endif
@@ -58,6 +63,19 @@ int main(int, char**)
     
     SDL_DisplayMode mode;
     SDL_GetCurrentDisplayMode(0, &mode);
+
+// #ifdef _WIN32 //set icon with windows api
+//     SDL_SysWMinfo wmInfo;
+//     SDL_VERSION(&wmInfo.version);
+//     SDL_GetWindowWMInfo(window, &wmInfo);
+//     HWND hwnd = wmInfo.info.win.window;
+//     HICON hIcon = static_cast<HICON>(LoadImage(hInstance, "..\\assets\\icons\\cplot.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE));
+
+//     if (hIcon) {
+//         SendMessage(hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIcon));
+//         SendMessage(hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hIcon));
+//     }
+// #endif
     
 
     BitMap image(mode.w, mode.h); //resolution set to max width
