@@ -234,45 +234,8 @@ int main(int, char**)
                 }
                 ImGui::EndMenu();
             }
-            /*
-            if(ImGui::BeginMenu("Framerate")) {
-                std::vector<int> options = {24, 30, 60, 144};
-                for(auto& o : options) {
-                    if(ImGui::MenuItem(std::to_string(o).c_str())) {
-                        framerate = o;
-                    }
-                }
-                ImGui::EndMenu();
-            }
-             */
-            // Add more menus as needed
             ImGui::EndMainMenuBar();
         }
-
-        if(show_save_popup) {
-            ImGui::OpenPopup("Save current view as JPEG");
-        }
-
-        if(ImGui::BeginPopupModal("Save current view as JPEG", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-            
-
-            char filename[80] = {0};
-            ImGui::Text("Save as...");
-            ImGui::SameLine();
-            if (ImGui::InputText("##", filename, IM_ARRAYSIZE(filename), ImGuiInputTextFlags_EnterReturnsTrue)) {
-                image.save_jpeg(filename);
-                ImGui::CloseCurrentPopup();
-                show_save_popup = false;
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Cancel")) {
-                ImGui::CloseCurrentPopup();
-                show_save_popup = false; // Close the popup
-            }
-            // End the popup modal
-            ImGui::EndPopup();
-        }
-
 
         menuBarHeight = ImGui::GetFrameHeightWithSpacing(); // Height of the menu bar
         ImGui::SetNextWindowPos(ImVec2(0, menuBarHeight));
