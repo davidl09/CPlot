@@ -36,6 +36,7 @@ SectionEnd
 
 Section "Uninstall"
     Delete $INSTDIR\bin\CPlot.exe
+    Delete $INSTDIR\bin\SDL2.dll
     RMDir $INSTDIR\bin
     Delete $INSTDIR\assets\fonts\calibri.ttf
     Delete $INSTDIR\assets\icons\cplot.ico

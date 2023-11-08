@@ -1,15 +1,14 @@
-[submodule "imgui"]
-	path = deps/imgui
-	url = https://github.com/ocornut/imgui
-	branch = docking
-[submodule "libcplot"]
-	path = deps/libcplot
-	url = https://github.com/davidl09/Complex-plot
-	branch = lib
-[submodule "deps/SDL"]
-	path = deps/SDL
+[submodule "submodules/SDL"]
+	path = submodules/SDL
 	url = https://github.com/libsdl-org/SDL.git
 	branch = SDL2
-[submodule "deps/portable-file-dialogs"]
-	path = deps/portable-file-dialogs
+[submodule "submodules/portable-file-dialogs"]
+	path = submodules/portable-file-dialogs
 	url = https://github.com/samhocevar/portable-file-dialogs.git
+[submodule "submodules/astParser"]
+	path = submodules/astParser
+	url = https://github.com/davidl09/astParser
+[submodule "submodules/imgui"]
+	path = submodules/imgui
+	url = https://github.com/ocornut/imgui
+	branch = docking

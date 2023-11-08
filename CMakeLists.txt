@@ -10,12 +10,15 @@ else()
 endif()
 
 set(PROJECT_VER_PATCH 0)
-set(PROJECT_VER_MINOR 1)
+set(PROJECT_VER_MINOR 2)
 set(PROJECT_VER_MAJOR 0)
 
 set(PROJECT_VER "${PROJECT_VER_MAJOR}.${PROJECT_VER_MINOR}.${PROJECT_VER_PATCH}")
 
-add_subdirectory(deps)
+add_subdirectory(submodules)
+
+
+add_subdirectory(src)
 
 if(WIN32)
         add_executable(CPlot WIN32
@@ -28,42 +31,25 @@ else()
         )
 endif()
 
+target_include_directories(
+        CPlotSrc PUBLIC
+        SDL2::SDL2_INCLUDE_DIR
+        "${IMGUI_INCLUDE_DIR}"
+)
 
 target_include_directories(
         CPlot PUBLIC
         SDL2::SDL2_INCLUDE_DIR
+        "${IMGUI_INCLUDE_DIR}"
         "${PORTABLE_FILE_LIB_INCLUDE}"
+        "${CPLOT_INCLUDE_DIR}"
 )
-
-message("Include: ${PORTABLE_FILE_LIB_INCLUDE}")
-
 
 target_link_libraries(
         CPlot PUBLIC
         imgui
+        CPlotSrc
         libcplot
-        SDL2::SDL2-static
 )
 
-if (NOT WIN32) 
-        target_link_libraries(
-                CPlot PUBLIC 
-                pthread
-        )
-endif()
-
-set(CPACK_GENERATOR "NSIS")
-set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_SOURCE_DIR}/cmake/CPackConfig.cmake)
-
-if(WIN32)
-    if(MSVC)
-        install(TARGETS CPlot
-            DESTINATION bin COMPONENT binaries)
-        # install the target file since the foo target isn't built in this context.
-        install(FILES ${CMAKE_SOURCE_DIR}/assets/*
-            DESTINATION data COMPONENT data_files)
-    endif(MSVC)
-endif(WIN32)
-
-include(${CPACK_PROJECT_CONFIG_FILE})
 

@@ -2,14 +2,15 @@
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
 
-#include "libcplot.hpp"
-
-#include <SDL.h>
-
-#include <string>
-#include <cstring>
+#include "SDL.h"
 
 #include "portable-file-dialogs.h"
+
+#include "CPlotApp.h"
+
+#include <vector>
+#include <string>
+#include <complex>
 
 #if !SDL_VERSION_ATLEAST(2,0,17)
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
