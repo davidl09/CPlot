@@ -289,7 +289,7 @@ int main(int, char**)
         ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, menuBarHeight * 3));
         ImGui::Begin("Text Input", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
 
-        if(ImGui::SliderFloat("Image plot range", &maxval, 0.1, 1000, "%.3f", ImGuiSliderFlags_Logarithmic))
+        if(ImGui::SliderFloat("Image plot range", &maxval, 0.0001, 10000, "%.4f", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoRoundToFormat))
         {
             render_due = true;
         }
